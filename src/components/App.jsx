@@ -3,14 +3,35 @@ class App extends React.Component {
     super(props);
     
     this.state = {
-      currentVideo: exampleVideoData[0]
+      currentVideo: exampleVideoData[0],
+      videoData: exampleVideoData,
+      searchOptions: {
+        key: window.YOUTUBE_API_KEY,
+        query: $('#search').val(),
+        max: 5
+      }
     };
-      
+    
+    
+    this.passVideoData = this.passVideoData.bind(this);
     this.onVideoClick = this.onVideoClick.bind(this);
   }
   
+  passVideoData() {
+    this.setState({
+      searchOptions: {
+        key: window.YOUTUBE_API_KEY,
+        query: $('#search').val(),
+        max: 5
+      },
+    });
+    searchYouTube(this.state.searchOptions, (data) => this.setState({//window.searchyoutube?
+      videoData: data //morespecific? htis.state.vidoedate?
+    })).bind(this);//using bind correctly?
+    console.log(videoData);
+  }
+  
   onVideoClick(props) {
-    //console.log(props);
     this.setState({
       currentVideo: props.video
     });
@@ -21,7 +42,7 @@ class App extends React.Component {
       <div>
         <nav className="navbar">
           <div className="col-md-6 offset-md-3">
-            <div><h5><em>search</em> view goes here</h5></div>
+            <div><em>SEARCH: </em> <searchYouTube search={this.state.searchOptions} callback={this.onVideoClick} /><input type="text" id="search"/><input type="submit" onClick={() => this.passVideoData()}/></div>
           </div>
         </nav>
         <div className="row">
@@ -29,7 +50,7 @@ class App extends React.Component {
             <div><h5><em>videoPlayer</em> <VideoPlayer video={this.state.currentVideo} /></h5></div>
           </div>
           <div className="col-md-5">
-            <div><h5><em>Video List</em><VideoList videos={exampleVideoData} changeVid={this.onVideoClick}/></h5></div>
+            <div><h5><em>Video List</em><VideoList videos={this.state.videoData} changeVid={this.onVideoClick}/></h5></div>
           </div>
         </div>
       </div>
@@ -37,8 +58,12 @@ class App extends React.Component {
   }
 }
 
-// In the ES6 spec, files are "modules" and do not share a top-level scope
-// `var` declarations will only exist globally where explicitly defined
+// {
+//   key: window.YOUTUBE_API_KEY,
+//   query: 'react',
+//   max: 5
+// }
+
 window.App = App;
 
 ReactDOM.render(<App />, document.getElementById("app"));
